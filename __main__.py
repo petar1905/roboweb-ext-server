@@ -81,6 +81,7 @@ def update_extension(id):
     if not metadata['settings'].startswith('{'):
         return jsonify({'error': 'Settings must be a JSON object'}), 400
     filename = f"{metadata['model'].lower()}-{metadata['manufacturer'].lower()}-{metadata['version']}.js"
+    filename = filename.replace(" ", "-")
     file_id = fs.put(file, content_type='application/javascript', filename=filename, metadata=metadata)
     return jsonify({'_id': str(file_id)}), 200
 
