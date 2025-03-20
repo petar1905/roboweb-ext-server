@@ -16,7 +16,6 @@ cors = CORS(app, resources={r"/*": {"origins": os.getenv("ALLOWED_ORIGINS"), "me
 
 
 @app.route('/extensions', methods=['POST'])
-##(origins=os.getenv("ALLOWED_ORIGINS"))
 def create_extension():
     file = request.files['file']
     metadata = {
@@ -30,12 +29,11 @@ def create_extension():
     }
     if not metadata['settings'].startswith('{'):
         return jsonify({'error': 'Settings must be a JSON object'}), 400
-    filename = f"{metadata['model'].lower()}-{metadata['manufacturer'].lower()}-{metadata['version']}.js"
-    file_id = fs.put(file, content_type='application/javascript', filename=filename, metadata=metadata)
+    filename = f"{metadata['model'].lower()}-{metadata['manufacturer'].lower()}-{metadata['version']}.html"
+    file_id = fs.put(file, content_type='text/html', filename=filename, metadata=metadata)
     return jsonify({'_id': str(file_id)}), 201
 
 @app.route('/extensions/<id>', methods=['GET'])
-#(origins=os.getenv("ALLOWED_ORIGINS"))
 def get_extension(id):
     file = fs.get(ObjectId(id))
     if file:
@@ -50,7 +48,6 @@ def get_extension(id):
         return jsonify({'error': 'File not found'}), 404
 
 @app.route('/extensions', methods=['GET'])
-#(origins=os.getenv("ALLOWED_ORIGINS"))
 def get_all_extensions():
     files = fs.find()
     output = []
@@ -65,7 +62,6 @@ def get_all_extensions():
     return jsonify({'extensions': output})
 
 @app.route('/extensions/<id>', methods=['PUT'])
-#(origins=os.getenv("ALLOWED_ORIGINS"))
 def update_extension(id):
     fs.delete(ObjectId(id))
     file = request.files['file']
@@ -82,15 +78,14 @@ def update_extension(id):
         return jsonify({'error': 'Settings must be a JSON object'}), 400
     filename = f"{metadata['model'].lower()}-{metadata['manufacturer'].lower()}-{metadata['version']}.js"
     filename = filename.replace(" ", "-")
-    file_id = fs.put(file, content_type='application/javascript', filename=filename, metadata=metadata)
+    file_id = fs.put(file, content_type='text/html', filename=filename, metadata=metadata)
     return jsonify({'_id': str(file_id)}), 200
 
 @app.route('/extensions/<id>', methods=['DELETE'])
-#(origins=os.getenv("ALLOWED_ORIGINS"))
 def delete_extension(id):
     fs.delete(ObjectId(id))
     return jsonify({'message': 'Extension deleted successfully'}), 200
 
 if __name__ == '__main__':
     debug = (os.getenv("DEBUG_MODE", "False").lower() == "true")
-    app.run(debug=debug)
+    app.run(debug=debug, host='0.0.0.0')
