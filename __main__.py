@@ -88,4 +88,4 @@ def delete_extension(id):
 
 if __name__ == '__main__':
     debug = (os.getenv("DEBUG_MODE", "False").lower() == "true")
-    app.run(debug=debug, host='0.0.0.0')
+    app.run(debug=debug, host=os.getenv("HOST", "0.0.0.0"))
